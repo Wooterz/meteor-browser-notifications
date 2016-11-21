@@ -1,32 +1,47 @@
-BrowserNotifications = new Mongo.Collection('browserNotifications')
+const BrowserNotifications;
 
-if Meteor.isServer
-  BrowserNotifications.sendNotification = (opts) ->
-    id = BrowserNotifications.insert
-      userId: opts.userId
-      title: opts.title
+BrowserNotifications = new Mongo.Collection('browserNotifications');
+
+if (Meteor.isServer) {
+  BrowserNotifications.sendNotification = function(opts) {
+    var id;
+    id = BrowserNotifications.insert({
+      userId: opts.userId,
+      title: opts.title,
       body: opts.body
+    });
+    return Meteor.setTimeout(function() {
+      return BrowserNotifications.remove(id);
+    }, 60000);
+  };
+  Meteor.publish('notifications', function() {
+    return BrowserNotifications.find({
+      userId: this.userId
+    });
+  });
+  BrowserNotifications.allow({
+    insert: function() {
+      return false;
+    },
+    update: function() {
+      return false;
+    },
+    remove: function(userId, doc) {
+      return userId === doc.userId;
+    }
+  });
+}
 
-    #60 second window for the browser to receive and present the notification.
-    Meteor.setTimeout () ->
-      BrowserNotifications.remove id
-    , 60000
-
-
-  Meteor.publish 'notifications', ->
-    BrowserNotifications.find({userId: @userId})
-
-  BrowserNotifications.allow
-    insert: -> false
-    update: -> false
-    remove: (userId, doc) -> userId is doc.userId
-
-if Meteor.isClient
-  Meteor.subscribe 'notifications'
-
-  BrowserNotifications.find().observe
-    added: (doc) ->
-      Notification.requestPermission (p) ->
-        new Notification doc.title,
+if (Meteor.isClient) {
+  Meteor.subscribe('notifications');
+  BrowserNotifications.find().observe({
+    added: function(doc) {
+      Notification.requestPermission(function(p) {
+        return new Notification(doc.title, {
           body: doc.body
-      BrowserNotifications.remove(doc._id)
+        });
+      });
+      return BrowserNotifications.remove(doc._id);
+    }
+  });
+}
