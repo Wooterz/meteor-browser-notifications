@@ -1,19 +1,19 @@
 # Browser Notifications
 
 Wooterz application prototype of a Browser Notification API package.
-(fork form mpaddock:meteor-browser-notifications)
+(massive fork of mpaddock:meteor-browser-notifications)
 
 ## Installation
 
 ``` sh
-$ meteor add wooterz:browser-notifications
+$ meteor add wooterz:browsifications
 ```
 
 ## API
 
-On the server, BrowserNotifications.sendNotification takes an object of options:
+On the server, Browsifications.sendNotification takes an object of options:
 ```
-BrowserNotifications.sendNotification({
+Browsifications.sendNotification({
   userId: a12345678,
   title: "Notification title",
   body: "Notification body"
@@ -21,7 +21,7 @@ BrowserNotifications.sendNotification({
 ```
 
 - Notifications are sent to the client upon publication. 
-- After 60 seconds, they are removed from the database so users aren't flooded with notifications upon return to the page.
+- After 60 seconds, they are removed from the database.
 
 
 ### @TODO  :
